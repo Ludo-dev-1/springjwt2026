@@ -1,5 +1,6 @@
 package co.simplon.springjwt.controller;
 
+import co.simplon.springjwt.dto.LoginDto;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,14 +38,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserEntity user) {
+    public LoginDto login(@RequestBody UserEntity user) {
 
         Authentication auth = this.authManager.authenticate(new UsernamePasswordAuthenticationToken(
                 user.getUsername(), user.getPassword()));
         String token = tokenService.generateToken(auth);
 
-        return token;
+        // récupère l'utilisateur connecté
+        UserEntity userConnected = (UserEntity) auth.getPrincipal();
+        return new LoginDto(token, userConnected.getUsername());
     }
+
 
     @PostMapping("/register")
     public UserEntity registerUser(@RequestBody UserEntity user) {
